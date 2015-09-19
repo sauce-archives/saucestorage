@@ -1,0 +1,94 @@
+#!/usr/bin/env python
+
+# command line interface to saucestorage
+
+import argparse
+from saucestorage import SauceStorageClient
+import logging
+import os
+from os.path import abspath, expanduser
+import time
+
+FORMATTER = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+log = logging.getLogger(__name__)
+
+TIME_FMT = "%b %d %Y %H:%M:%S"
+LS_FMT = '{:>10}  {:<20}  {:<30}'
+
+def log_to_stderr(level=logging.INFO):
+    root = logging.getLogger()
+    root.setLevel(level)
+    handler = logging.StreamHandler()
+    handler.setFormatter(FORMATTER)
+    root.addHandler(handler)
+
+def absolute_path_argument(path):
+    return abspath(expanduser(path))
+
+def parse_args():
+    # note that for arguments which eventually get fed into
+    # isign.resign, we deliberately don't set defaults. The kwarg
+    # defaults in isign.resign will be used
+    parser = argparse.ArgumentParser(
+        description='Resign an iOS application with a new identity '
+                    'and provisioning profile.')
+    parser.add_argument(
+        '-p', '--put',
+        dest='put',
+        required=False,
+        metavar='<path>',
+        type=absolute_path_argument,
+        help='Path to file'
+    )
+    parser.add_argument(
+        '-l', '--list',
+        dest='ls',
+        required=False,
+        action='store_true',
+        help='List files'
+    )
+    parser.add_argument(
+        '-v', '--verbose',
+        dest='verbose',
+        action='store_true',
+        default=False,
+        required=False,
+        help='Set logging level to debug.'
+    )
+    parser.add_argument(
+        '-d', '--data',
+        dest='as_data',
+        action='store_true',
+        default=False,
+        required=False,
+        help='Print results as python data structure'
+    )
+
+
+    return parser.parse_args()
+
+
+if __name__ == '__main__':
+    args = parse_args()
+
+    if args.verbose:
+        level = logging.DEBUG
+    else:
+        level = logging.INFO
+    log_to_stderr(level)
+
+    sc = SauceStorageClient(username=os.environ['SAUCE_USERNAME'],
+                            access_key=os.environ['SAUCE_ACCESS_KEY'])
+    if args.ls:
+        files = sc.ls()
+        files.sort(key=lambda f: f['name'])
+        if args.as_data:
+            print files
+        else:
+            for f in files:
+                mtime = time.strftime(TIME_FMT, time.gmtime(f['mtime']))
+                print LS_FMT.format(f['size'], mtime, f['name'])
+    elif args.put:
+        sc.put(args.put)
+    else:
+        parser.print_help()
