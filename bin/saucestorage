@@ -30,8 +30,7 @@ def parse_args():
     # isign.resign, we deliberately don't set defaults. The kwarg
     # defaults in isign.resign will be used
     parser = argparse.ArgumentParser(
-        description='Resign an iOS application with a new identity '
-                    'and provisioning profile.')
+        description='List files or upload file to Sauce Labs storage API.')
     parser.add_argument(
         '-p', '--put',
         dest='put',
