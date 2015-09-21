@@ -109,7 +109,7 @@ class SauceStorageClient(object):
     # API METHODS
     #
 
-    def ls(self):
+    def list(self):
         """ List all files in storage """
         url = self.get_method_url('storage')
         json_data = self.request('GET', url)

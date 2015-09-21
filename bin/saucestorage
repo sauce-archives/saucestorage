@@ -44,7 +44,7 @@ def log_to_stderr(level=logging.INFO):
 class SauceStorageTool(object):
 
     TIME_FMT = "%b %d %Y %H:%M:%S"
-    LS_FMT = '{:>10}  {:<20}  {:<50}  {:>8}'
+    LIST_FMT = '{:>10}  {:<20}  {:<50}  {:>8}'
 
     def __init__(self):
         """ parse args using subcommand pattern, like git """
@@ -56,7 +56,10 @@ class SauceStorageTool(object):
                "    put\n"
                "\n"
                "For help with commands, use:\n"
-               "    {executable} <command> -h")
+               "    {executable} <command> -h\n"
+               "\n"
+               "You must have your SAUCE_USERNAME and SAUCE_ACCESS_KEY "
+               "environment variables defined.")
         parser = argparse.ArgumentParser(
             description='List files or upload file to Sauce Labs storage API.',
             usage=usage.format(executable=self.executable)
@@ -98,7 +101,7 @@ class SauceStorageTool(object):
     def get_sauce_storage_client(self):
         for key in ['SAUCE_USERNAME', 'SAUCE_ACCESS_KEY']:
             if key not in os.environ:
-                raise Exception("missing {} environment variable".format(key))
+                raise Exception("Missing {} environment variable".format(key))
         return SauceStorageClient(username=os.environ['SAUCE_USERNAME'],
                                   access_key=os.environ['SAUCE_ACCESS_KEY'])
 
@@ -136,12 +139,12 @@ class SauceStorageTool(object):
 
     def list(self):
         parser = argparse.ArgumentParser(
-                description='List files in storage using Sauce Labs Storage API.',
-                prog = self.executable + ' list'
+            description='List files in storage using Sauce Labs Storage API.',
+            prog = self.executable + ' list'
         )
         self.add_common_flags(parser)
         args = parser.parse_args(sys.argv[2:])
-        files = self.storage_api.ls()
+        files = self.storage_api.list()
         files.sort(key=lambda f: f['name'])
         LOG.debug(files)
         if args.as_data:
@@ -149,10 +152,10 @@ class SauceStorageTool(object):
         else:
             for f in files:
                 mtime = time.strftime(self.TIME_FMT, time.gmtime(f['mtime']))
-                print self.LS_FMT.format(f['size'],
-                                         mtime,
-                                         f['name'],
-                                         f['md5'][0:8])
+                print self.LIST_FMT.format(f['size'],
+                                           mtime,
+                                           f['name'],
+                                           f['md5'][0:8])
 
 
 if __name__ == '__main__':
