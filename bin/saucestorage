@@ -1,19 +1,38 @@
 #!/usr/bin/env python
 
+# Copyright 2015 Sauce Labs.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+
+# Sauce Labs REST API documentation:
+# http://saucelabs.com/docs/rest
+
+
 # command line interface to saucestorage
 
 import argparse
-from saucestorage import SauceStorageClient
 import logging
 import os
-from os.path import abspath, expanduser
+from os.path import abspath, basename, expanduser
+from saucestorage import SauceStorageClient
+import sys
 import time
 
 FORMATTER = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
-TIME_FMT = "%b %d %Y %H:%M:%S"
-LS_FMT = '{:>10}  {:<20}  {:<30}'
+def absolute_path_argument(path):
+    return abspath(expanduser(path))
 
 def log_to_stderr(level=logging.INFO):
     root = logging.getLogger()
@@ -22,72 +41,119 @@ def log_to_stderr(level=logging.INFO):
     handler.setFormatter(FORMATTER)
     root.addHandler(handler)
 
-def absolute_path_argument(path):
-    return abspath(expanduser(path))
+class SauceStorageTool(object):
 
-def parse_args():
-    # note that for arguments which eventually get fed into
-    # isign.resign, we deliberately don't set defaults. The kwarg
-    # defaults in isign.resign will be used
-    parser = argparse.ArgumentParser(
-        description='List files or upload file to Sauce Labs storage API.')
-    parser.add_argument(
-        '-p', '--put',
-        dest='put',
-        required=False,
-        metavar='<path>',
-        type=absolute_path_argument,
-        help='Path to file'
-    )
-    parser.add_argument(
-        '-l', '--list',
-        dest='ls',
-        required=False,
-        action='store_true',
-        help='List files'
-    )
-    parser.add_argument(
-        '-v', '--verbose',
-        dest='verbose',
-        action='store_true',
-        default=False,
-        required=False,
-        help='Set logging level to debug.'
-    )
-    parser.add_argument(
-        '-d', '--data',
-        dest='as_data',
-        action='store_true',
-        default=False,
-        required=False,
-        help='Print results as python data structure'
-    )
+    TIME_FMT = "%b %d %Y %H:%M:%S"
+    LS_FMT = '{:>10}  {:<20}  {:<50}  {:>8}'
 
+    def __init__(self):
+        """ parse args using subcommand pattern, like git """
+        self.executable = basename(sys.argv[0])
+        usage=("{executable} <command> <flags> args\n"
+               "\n"
+               "Commands:\n"
+               "    list\n"
+               "    put\n"
+               "\n"
+               "For help with commands, use:\n"
+               "    {executable} <command> -h")
+        parser = argparse.ArgumentParser(
+            description='List files or upload file to Sauce Labs storage API.',
+            usage=usage.format(executable=self.executable)
+        )
+        parser.add_argument('command', help='Subcommand to run')
+        args = parser.parse_args(sys.argv[1:2])
+        self.storage_api = self.get_sauce_storage_client()
+        if not hasattr(self, args.command):
+            parser.print_help()
+            sys.exit(1)
+        command = getattr(self, args.command)
+        command()
 
-    return parser.parse_args()
+    def add_common_flags(self, parser):
+        parser.add_argument(
+            '-v', '--verbose',
+            dest='verbose',
+            action='store_true',
+            default=False,
+            required=False,
+            help='Extra logging'
+        )
+        parser.add_argument(
+            '-d', '--data',
+            dest='as_data',
+            action='store_true',
+            default=False,
+            required=False,
+            help='Print results as python data structure'
+        )
 
+    def process_common_flags(self, args):
+        if args.verbose:
+            level = logging.DEBUG
+        else:
+            level = logging.INFO
+        log_to_stderr(level)
 
-if __name__ == '__main__':
-    args = parse_args()
+    def get_sauce_storage_client(self):
+        for key in ['SAUCE_USERNAME', 'SAUCE_ACCESS_KEY']:
+            if key not in os.environ:
+                raise Exception("missing {} environment variable".format(key))
+        return SauceStorageClient(username=os.environ['SAUCE_USERNAME'],
+                                  access_key=os.environ['SAUCE_ACCESS_KEY'])
 
-    if args.verbose:
-        level = logging.DEBUG
-    else:
-        level = logging.INFO
-    log_to_stderr(level)
+    def put(self):
+        parser = argparse.ArgumentParser(
+            description='Put a file into storage using Sauce Labs Storage API.',
+            prog = self.executable + ' put'
+        )
+        self.add_common_flags(parser)
+        parser.add_argument(
+            '-c', '--checkhash',
+            dest='checkhash',
+            action='store_true',
+            default=False,
+            required=False,
+            help='Check hash after upload'
+        )
+        parser.add_argument(
+            '-n', '--name',
+            help='Store file with this filename',
+            default=None
+        )
+        parser.add_argument(
+            'file',
+            help='File to upload',
+            type=absolute_path_argument,
+            metavar='<path>'
+        )
+        args = parser.parse_args(sys.argv[2:])
+        self.process_common_flags(args)
+        result = self.storage_api.put(args.file,
+                                      file_name=args.name,
+                                      verify=args.checkhash)
+        LOG.debug(result)
 
-    sc = SauceStorageClient(username=os.environ['SAUCE_USERNAME'],
-                            access_key=os.environ['SAUCE_ACCESS_KEY'])
-    if args.ls:
-        files = sc.ls()
+    def list(self):
+        parser = argparse.ArgumentParser(
+                description='List files in storage using Sauce Labs Storage API.',
+                prog = self.executable + ' list'
+        )
+        self.add_common_flags(parser)
+        args = parser.parse_args(sys.argv[2:])
+        files = self.storage_api.ls()
         files.sort(key=lambda f: f['name'])
+        LOG.debug(files)
         if args.as_data:
             print files
         else:
             for f in files:
-                mtime = time.strftime(TIME_FMT, time.gmtime(f['mtime']))
-                print LS_FMT.format(f['size'], mtime, f['name'])
-    elif args.put:
-        sc.put(args.put)
-    else:
-        parser.print_help()
+                mtime = time.strftime(self.TIME_FMT, time.gmtime(f['mtime']))
+                print self.LS_FMT.format(f['size'],
+                                         mtime,
+                                         f['name'],
+                                         f['md5'][0:8])
+
+
+if __name__ == '__main__':
+    SauceStorageTool()

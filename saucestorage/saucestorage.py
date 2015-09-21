@@ -1,4 +1,3 @@
-#
 # Copyright 2015 Sauce Labs.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -10,19 +9,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# http://www.apache.org/licenses/LICENSE-2.0
 #
+# http://www.apache.org/licenses/LICENSE-2.0
+
+
 # -----------------
 # Based on sauceclient by Corey Goldberg
 # https://github.com/cgoldberg/sauceclient
 # ----------------
-#
+
+
 # Sauce Labs REST API documentation:
 # http://saucelabs.com/docs/rest
 
 
 import base64
+import hashlib
 import json
 import logging
 import os.path
@@ -95,8 +97,18 @@ class SauceStorageClient(object):
             base64string = base64.b64encode(auth_info.encode(encoding='UTF-8')).decode(encoding='UTF-8')
         return base64string
 
+    def get_file_md5(self, file_path, block_size=2**20):
+        digest = hashlib.md5()
+        with open(os.path.join(file_path), "rb") as f:
+            while True:
+                buf = f.read(block_size)
+                if not buf:
+                    break
+                digest.update(buf)
+        return digest.hexdigest()
+
     #
-    # METHODS
+    # API METHODS
     #
 
     def ls(self):
@@ -106,7 +118,7 @@ class SauceStorageClient(object):
         result = json_loads(json_data)
         return result['files']
 
-    def put(self, file_path, file_name=None, overwrite=True):
+    def put(self, file_path, file_name=None, overwrite=True, verify=False):
         """ Upload a file to storage """
         if file_name is None:
             file_name = os.path.basename(file_path)
@@ -119,4 +131,11 @@ class SauceStorageClient(object):
                                      url,
                                      body=body,
                                      content_type='application/octet-stream')
-        return json_loads(json_data)
+        result = json_loads(json_data)
+        if verify:
+            local_hash = self.get_file_md5(file_path)
+            remote_hash = result['md5']
+            if local_hash != remote_hash:
+                msg = "Uploaded, but md5 hashes differ. Expected {}, upload server returned {}"
+                raise Exception(msg.format(local_hash, remote_hash))
+        return result
