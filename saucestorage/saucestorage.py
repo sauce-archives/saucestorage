@@ -49,9 +49,7 @@ def json_loads(json_data):
 
 
 class SauceException(Exception):
-    def __init__(self, *args, **kwargs):
-        super(SauceException, self).__init__(*args, **kwargs)
-        self.response = kwargs.get("response")
+    pass
 
 
 class SauceStorageClient(object):
@@ -86,7 +84,7 @@ class SauceStorageClient(object):
         connection.close()
         if response.status != 200:
             raise SauceException('%s: %s.\nSauce Status NOT OK' %
-                                 (response.status, response.reason), response=response)
+                                 (response.status, response.reason))
         return json_data
 
     def get_encoded_auth_string(self):
