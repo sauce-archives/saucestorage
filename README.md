@@ -32,7 +32,7 @@ In the example in the Synopsis, the user wants to test the Android app `NewApp.a
 can upload it to the Storage API as shown, and then, in the `capabilities` for her test,
 refer to the app as `sauce-storage:NewApp.apk`.
 
-### iOS Real Device Cloud
+#### iOS Real Device Cloud
 
 For tests that use the Sauce Labs iOS Real Device Cloud, you *must* upload your app
 to Sauce Storage first, and refer to it with a `sauce-storage` URL.
