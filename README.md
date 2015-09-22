@@ -6,12 +6,12 @@ Simple Python interface and command-line tool to the `sauce-storage` API of Sauc
 
 ``` bash
 $ saucestorage list 
-   2069068  Sep 19 2015 01:15:21  Sample.app.zip 
+   2069068  Sep 19 2015 01:15:21  Sample.ipa 
 
 $ saucestorage put MyApp.apk
 
 $ saucestorage list
-   2069068  Sep 19 2015 01:15:21  Sample.app.zip 
+   2069068  Sep 19 2015 01:15:21  Sample.ipa 
   13317873  Sep 19 2015 01:20:55  MyApp.apk
 ```
 
@@ -19,7 +19,8 @@ $ saucestorage list
 
 If you run tests inside [Sauce Labs](http://saucelabs.com), sometimes you want the test 
 to download a large file. This is particularly true when you are testing a mobile
-app; the first thing the test has to do is get your Android `.apk` or iOS `.app.zip`.
+app; the first thing the test has to do is get the app to run, such as an Android 
+`.apk` or iOS `.ipa`.
 
 You could put the file on public website (where anyone can see it), and download it 
 over and over with each test.
@@ -130,7 +131,7 @@ file_list = storage_api.list()
 for f in file_list:
     print f['name']
 
-storage_api.put('/Users/me/SomeApp.zip')
+storage_api.put('/Users/me/SomeApp.ipa')
 ```
 
 ## Limitations of the Sauce Storage API
