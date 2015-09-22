@@ -18,25 +18,27 @@ $ saucestorage list
 ## What's this good for?
 
 If you run tests inside [Sauce Labs](http://saucelabs.com), sometimes you want the test 
-to download a large file. This is particularly true when you are testing a mobile
-app; the first thing the test has to do is get the app to run, such as an Android 
+to download a large file. For instance, when you are testing a mobile
+app, the test has to obtain the app to run, such as an Android 
 `.apk` or iOS `.ipa`.
 
-You could put the file on public website (where anyone can see it), and download it 
-over and over with each test.
+You could put the app on one of your websites, but then the tests have to download the app
+over and over again.
 
-Or, you could upload it to the Sauce Storage API, and then the file is right inside 
-Sauce Labs already, in a secure area that only you can see. You can then
-refer to the file inside your tests with a `sauce-storage:` URL. 
+Another option is to use the Sauce Storage API. You upload the file once to Sauce Storage,
+and when your test wants it, it's already right there, in Sauce Labs' network.
 
-In the example in the Synopsis, the user wants to test the Android app `NewApp.apk`. She
-can upload it to the Storage API as shown, and then, in the `capabilities` for her test,
-refer to the app as `sauce-storage:NewApp.apk`.
+In the example in the Synopsis, the user wants to test the Android app `MyApp.apk`. She
+uploads it as shown, and then, in the `capabilities` for her tests,
+she refers to the app as `sauce-storage:MyApp.apk`.
+
+You can already use Sauce Storage with a simple `curl` command, but this utility should make it 
+a bit easier.
 
 #### iOS Real Device Cloud
 
 For tests that use the Sauce Labs iOS Real Device Cloud, you *must* upload your app
-to Sauce Storage first, and refer to it with a `sauce-storage` URL.
+to Sauce Storage first, and refer to it in the test capabilities with a `sauce-storage:` URL.
 
 ## Getting started
 
