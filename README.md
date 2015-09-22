@@ -25,8 +25,10 @@ app, the test has to obtain the app to run, such as an Android
 You could put the app on one of your websites, but then the tests have to download the app
 over and over again.
 
-Another option is to use the Sauce Storage API. You upload the file once to Sauce Storage,
-and when your test wants it, it's already right there, in Sauce Labs' network.
+Another option is to use the 
+[Sauce Labs Storage API](https://docs.saucelabs.com/reference/rest-api/#temporary-storage). You
+upload the file once to Sauce Storage, and when your test wants it, it's already right 
+there, in Sauce Labs' network.
 
 In the example in the Synopsis, the user wants to test the Android app `MyApp.apk`. She
 uploads it as shown, and then, in the `capabilities` for her tests,
