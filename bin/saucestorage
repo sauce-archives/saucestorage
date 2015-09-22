@@ -44,7 +44,7 @@ def log_to_stderr(level=logging.INFO):
 class SauceStorageTool(object):
 
     TIME_FMT = "%b %d %Y %H:%M:%S"
-    LIST_FMT = '{:>10}  {:<20}  {:<50}  {:>8}'
+    LIST_FMT = '{:>10}  {:<20}  {:<50}'
 
     def __init__(self):
         """ parse args using subcommand pattern, like git """
@@ -154,8 +154,7 @@ class SauceStorageTool(object):
                 mtime = time.strftime(self.TIME_FMT, time.gmtime(f['mtime']))
                 print self.LIST_FMT.format(f['size'],
                                            mtime,
-                                           f['name'],
-                                           f['md5'][0:8])
+                                           f['name'])
 
 
 if __name__ == '__main__':
