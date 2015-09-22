@@ -1,6 +1,7 @@
 # saucestorage
 
-Simple Python interface and command-line tool to the `sauce-storage` API of Sauce Labs.
+Simple Python interface and command-line tool to the 
+[Sauce Labs Storage API](https://docs.saucelabs.com/reference/rest-api/#temporary-storage). 
 
 ## Synopsis
 
