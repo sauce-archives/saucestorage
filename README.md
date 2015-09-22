@@ -4,7 +4,7 @@ Simple Python interface and command-line tool to the `sauce-storage` API of Sauc
 
 ## Synopsis
 
-``` bash
+```bash
 $ saucestorage list 
    2069068  Sep 19 2015 01:15:21  Sample.ipa 
 
@@ -65,9 +65,9 @@ your account on the Sauce Labs website.
 
 Type these commands:
 
-```
-$ export SAUCE_USERNAME=your_username
-$ export SAUCE_ACCESS_KEY=your_access_key
+```bash
+export SAUCE_USERNAME=your_username
+export SAUCE_ACCESS_KEY=your_access_key
 ```
 
 You might want to add these lines to your shell's startup profile, which for most people
@@ -78,8 +78,8 @@ is in their home directory under `.bash_profile`.
 Type these commands:
 
 ```
-$ set SAUCE_USERNAME=your_username
-$ set SAUCE_ACCESS_KEY=your_access_key
+set SAUCE_USERNAME=your_username
+set SAUCE_ACCESS_KEY=your_access_key
 ```
 
 You might want to add this to your default environment variables.
@@ -88,8 +88,8 @@ You might want to add this to your default environment variables.
 
 Next, just install this package with `pip`:
 
-``` bash
-$ pip install saucestorage
+```bash
+pip install saucestorage
 ```
 
 Then, the `saucestorage` program should be installed for you, and you can invoke it 
