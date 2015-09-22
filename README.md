@@ -45,11 +45,25 @@ to Sauce Storage first, and refer to it in the test capabilities with a `sauce-s
 You'll need to be familiar with running scripts on the command line, and have
 Python 2.x or better installed.
 
-First you'll need a couple of environment variables. `SAUCE_USERNAME` should be the 
-username you use to log into [https://saucelabs.com/](http://saucelabs.com/). Your 
-*access key* is available in your User Settings page. (Click on your username in the 
-Sauce Labs web interface to find the settings. Your access key should be a long string
-of numbers, letters, and dashes.)
+First you'll need a couple of environment variables. 
+
+### Environment variables
+
+`SAUCE_USERNAME` should be the 
+username you use to log into [https://saucelabs.com/](http://saucelabs.com/). 
+
+`SAUCE_ACCESS_KEY` should be the "access key" that Sauce assigned to you. To find it, first log into
+your account on the Sauce Labs website.
+* If you're using the new interface (it looks blue), click on the user account in the bottom left-hand
+  corner. This should pop open a menu. Click on 'User Settings'. This opens your User Settings page. 
+  Scroll down to find your Access Key.
+* In the old interface (it looks more red and yellow), the Access Key is in the grey column on the 
+  left hand side.
+
+
+#### Linux or Mac OS X users
+
+Type these commands:
 
 ```
 $ export SAUCE_USERNAME=your_username
@@ -59,6 +73,19 @@ $ export SAUCE_ACCESS_KEY=your_access_key
 You might want to add these lines to your shell's startup profile, which for most people
 is in their home directory under `.bash_profile`.
 
+#### Windows users
+
+Type these commands:
+
+```
+$ set SAUCE_USERNAME=your_username
+$ set SAUCE_ACCESS_KEY=your_access_key
+```
+
+You might want to add this to your default environment variables.
+
+### Install the Python package
+
 Next, just install this package with `pip`:
 
 ``` bash
@@ -66,7 +93,7 @@ $ pip install saucestorage
 ```
 
 Then, the `saucestorage` program should be installed for you, and you can invoke it 
-as in the Synopsis above.
+as in the Synopsis above. You can also use it from a Python script -- see below.
 
 ## Command-line options
 
