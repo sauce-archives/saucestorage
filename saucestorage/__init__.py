@@ -138,4 +138,6 @@ class SauceStorageClient(object):
             if local_hash != remote_hash:
                 msg = "Uploaded, but md5 hashes differ. Expected {}, upload server returned {}"
                 raise Exception(msg.format(local_hash, remote_hash))
+        # add the sauce-storage URL
+        result['url'] = 'sauce-storage:' + result['filename']
         return result
