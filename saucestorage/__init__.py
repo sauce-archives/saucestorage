@@ -41,6 +41,8 @@ if is_py2:
 else:
     import http.client as http_client
 
+SAUCE_API_ENDPOINT = "saucelabs.com"
+
 
 def json_loads(json_data):
     if not is_py2:
@@ -53,10 +55,10 @@ class SauceException(Exception):
 
 
 class SauceStorageClient(object):
-    def __init__(self, hostname='saucelabs.com', username=None, access_key=None):
-        self.hostname = hostname
-        self.username = username
+    def __init__(self, username, access_key, api_endpoint=SAUCE_API_ENDPOINT):
+        self.api_endpoint = api_endpoint
         self.access_key = access_key
+        self.username = username
 
     def get_method_url(self, group, path=None, query=None):
         url = '/rest/v1/%s/%s' % (group, self.username)
@@ -75,7 +77,7 @@ class SauceStorageClient(object):
         return headers
 
     def request(self, method, url, body=None, content_type='application/json'):
-        connection = http_client.HTTPSConnection(self.hostname)
+        connection = http_client.HTTPSConnection(self.api_endpoint)
         headers = self.get_headers(content_type)
         log.debug("{}ing {}...".format(method, url))
         connection.request(method, url, body, headers=headers)

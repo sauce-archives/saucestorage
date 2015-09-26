@@ -43,9 +43,6 @@ def log_to_stderr(level=logging.INFO):
 
 class SauceStorageTool(object):
 
-    TIME_FMT = "%b %d %Y %H:%M:%S"
-    LIST_FMT = '{:>10}  {:<20}  {:<50}'
-
     def __init__(self):
         """ parse args using subcommand pattern, like git """
         self.executable = basename(sys.argv[0])
@@ -66,14 +63,17 @@ class SauceStorageTool(object):
         )
         parser.add_argument('command', help='Subcommand to run')
         args = parser.parse_args(sys.argv[1:2])
-        self.storage_api = self.get_sauce_storage_client()
-        if not hasattr(self, args.command):
+        if not hasattr(args, 'command'):
             parser.print_help()
             sys.exit(1)
-        command = getattr(self, args.command)
-        command()
+        if args.command == 'list':
+            command = List(self)
+        elif args.command == 'put':
+            command = Put(self)
+        command.execute()
 
-    def add_common_flags(self, parser):
+class SauceStorageCommand(object):
+    def __init__(self, parser):
         parser.add_argument(
             '-v', '--verbose',
             dest='verbose',
@@ -90,27 +90,40 @@ class SauceStorageTool(object):
             required=False,
             help='Print results as python data structure'
         )
-
-    def process_common_flags(self, args):
-        if args.verbose:
+        parser.add_argument(
+            '-a', '--api_endpoint',
+            dest='api_endpoint',
+            default=None,
+            required=False,
+            help=argparse.SUPPRESS
+        )
+        self.args = parser.parse_args(sys.argv[2:])
+        if self.args.verbose:
             level = logging.DEBUG
         else:
             level = logging.INFO
         log_to_stderr(level)
+        self.storage_api = self.get_sauce_storage_client()
 
     def get_sauce_storage_client(self):
         for key in ['SAUCE_USERNAME', 'SAUCE_ACCESS_KEY']:
             if key not in os.environ:
                 raise Exception("Missing {} environment variable".format(key))
-        return SauceStorageClient(username=os.environ['SAUCE_USERNAME'],
-                                  access_key=os.environ['SAUCE_ACCESS_KEY'])
+        args = [
+            os.environ['SAUCE_USERNAME'],
+            os.environ['SAUCE_ACCESS_KEY']
+        ]
+        if self.args.api_endpoint is not None:
+            args.append(self.args.api_endpoint)
+        return SauceStorageClient(*args)
 
-    def put(self):
+
+class Put(SauceStorageCommand):
+    def __init__(self, commander):
         parser = argparse.ArgumentParser(
             description='Put a file into storage using Sauce Labs Storage API.',
-            prog = self.executable + ' put'
+            prog = commander.executable + ' put'
         )
-        self.add_common_flags(parser)
         parser.add_argument(
             '-c', '--checkhash',
             dest='checkhash',
@@ -130,24 +143,30 @@ class SauceStorageTool(object):
             type=absolute_path_argument,
             metavar='<path>'
         )
-        args = parser.parse_args(sys.argv[2:])
-        self.process_common_flags(args)
-        result = self.storage_api.put(args.file,
-                                      file_name=args.name,
-                                      verify=args.checkhash)
+        super(Put, self).__init__(parser)
+
+    def execute(self):
+        result = self.storage_api.put(self.args.file,
+                                      file_name=self.args.name,
+                                      verify=self.args.checkhash)
         LOG.debug(result)
 
-    def list(self):
+class List(SauceStorageCommand):
+    TIME_FMT = "%b %d %Y %H:%M:%S"
+    LIST_FMT = '{:>10}  {:<20}  {:<50}'
+
+    def __init__(self, commander):
         parser = argparse.ArgumentParser(
             description='List files in storage using Sauce Labs Storage API.',
-            prog = self.executable + ' list'
+            prog = commander.executable + ' list'
         )
-        self.add_common_flags(parser)
-        args = parser.parse_args(sys.argv[2:])
+        super(List, self).__init__(parser)
+
+    def execute(self):
         files = self.storage_api.list()
         files.sort(key=lambda f: f['name'])
         LOG.debug(files)
-        if args.as_data:
+        if self.args.as_data:
             print files
         else:
             for f in files:
