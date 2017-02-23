@@ -217,3 +217,7 @@ Files will be retained for about a week.
 
 See the [Sauce Labs Storage API documentation](https://docs.saucelabs.com/reference/rest-api/#temporary-storage) 
 for more information.
+
+## Authors
+
+Neil Kandalgaonkar <neilk@saucelabs.com>
