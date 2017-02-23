@@ -31,7 +31,7 @@ import os.path
 import sys
 import urllib
 
-__version__ = '0.2'
+__version__ = '0.3.1'
 
 is_py2 = sys.version_info.major is 2
 log = logging.getLogger(__name__)
