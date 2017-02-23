@@ -1,13 +1,16 @@
 # encoding: utf-8
-from setuptools import setup, find_packages
 from codecs import open  # to use a consistent encoding
+from setuptools import setup, find_packages
 from subprocess import check_output
-from os import path
+from os import environ, path
 
 here = path.abspath(path.dirname(__file__))
 
 if path.exists(path.join(here, "version.sh")):  # development
-    version = check_output(path.join(here, "version.sh")).strip()
+    if 'PYTHON_PACKAGE_VERSION' in environ:
+        version = environ['PYTHON_PACKAGE_VERSION']
+    else:
+        version = check_output(path.join(here, "version.sh")).strip()
     package_name = path.basename(here)
 else:  # source package
     with open(path.join(here, "PKG-INFO")) as f:
@@ -32,6 +35,7 @@ setup(
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 2.7',
     ],
+    keywords=['saucelabs'],
     packages=find_packages(),
     install_requires=[],
     package_data={
