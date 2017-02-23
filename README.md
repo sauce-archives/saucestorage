@@ -100,19 +100,17 @@ as in the Synopsis above. You can also use it from a Python script -- see below.
 
 ## Command-line options
 
-`saucestorage` has two main functions: `list` and `put`. 
-
 ### list
 
 ```
-saucestorage list [-h] [-v] [-d]
+saucestorage list [-h] [-v] [-j]
 
 List files in storage using Sauce Labs Storage API.
 
 optional arguments:
   -h, --help     show this help message and exit
   -v, --verbose  Extra logging
-  -d, --data     Print results as python data structure
+  -j, --json     Print results as JSON
 ```
 
 By default, `list` shows you several columns: the size of the file in bytes, the 
@@ -121,7 +119,7 @@ date uploaded, and the file name.
 
 ### put
 ```
-saucestorage put [-h] [-v] [-d] [-c] [-n NAME] <path>
+saucestorage put [-h] [-v] [-j] [-n NAME] <path>
 
 Put a file into storage using Sauce Labs Storage API.
 
@@ -131,8 +129,7 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -v, --verbose         Extra logging
-  -d, --data            Print results as python data structure
-  -c, --checkhash       Check hash after upload
+  -j, --json            Print results as JSON
   -n NAME, --name NAME  Store file with this filename
 ```
 
@@ -140,15 +137,61 @@ The `--name` argument allows you to store a file under a different
 name than what it has on your filesystem. For instance:
 
 ``` bash
-$ saucestorage put -n RemoteName.zip /path/to/LocalName.zip
+$ saucestorage put 'My App.ipa' 
+File '/current/directory/My App.ipa' is now available as sauce-storage:My+App.ipa
+
+$ saucestorage put -n RemoteName.apk /path/to/LocalName.apk
+File '/current/directory/My App.ipa' is now available as sauce-storage:RemoteName.apk
 
 $ saucestorage list
-   4417873  Sep 19 2015 01:20:55  RemoteName.zip
+   2435341  Sep 19 2015 01:19:55  My App.ipa
+   4417873  Sep 19 2015 01:20:55  RemoteName.apk
 ```
 
-The `--checkhash` argument will double check that the uploaded file
-has the exact same contents as the original. Normally this is silent;
-it will only warn you if they are different.
+### update
+```
+saucestorage update [-h] [-v] [-j] [-n NAME] <path>
+
+Very similar to `put`, but it's usually better. 
+
+This will upload the file to Sauce Storage, but only if there
+isn't already a file in storage with the same name and content.
+
+positional arguments:
+  <path>                File to upload
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --verbose         Extra logging
+  -j, --json            Print results as JSON
+  -n NAME, --name NAME  Store file with this filename
+```
+
+
+### verify
+```
+saucestorage verify [-h] [-v] [-j] [-n NAME] <path>
+
+Checks if a local file has the same content as a file in your storage area.
+
+positional arguments:
+  <path>                Local file to compare
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --verbose         Extra logging
+  -j, --json            Print results as JSON
+  -n NAME, --name NAME  Storage file to compare against 
+```
+
+As in `put`, the `--name` argument allows you to compare a file with a different name 
+than what is on your filesystem. 
+
+``` bash
+$ saucestorage verify /path/to/YourApp.ipa 
+Files match.
+```
+
 
 ## Python library
 
