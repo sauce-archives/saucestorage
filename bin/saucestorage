@@ -188,8 +188,11 @@ class List(SauceStorageCommand):
 
 class Update(SauceStorageCommand):
     def __init__(self, commander):
+        description = ("Very similar to `put`, but it's usually better. "
+                       "This will upload the file to Sauce Storage, but only if there "
+                       "isn't already a file there with the same name and content.")
         parser = argparse.ArgumentParser(
-            description='Uploads a file to Sauce Storage, if it is not already there and with the same contents',
+            description=description,
             prog = commander.executable + ' update'
         )
         parser.add_argument(
