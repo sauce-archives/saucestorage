@@ -7,12 +7,17 @@ Simple Python interface and command-line tool to the
 
 ```bash
 $ saucestorage list 
-   2069068  Sep 19 2015 01:15:21  Sample.ipa 
+      Size  Modification time     Name
+      ----  -----------------     ----
+   2069068  Sep 19 2015 01:15:21  Sample.ipa
 
 $ saucestorage put MyApp.apk
+File '/current/directory/MyApp.apk' is now available as sauce-storage:MyApp.apk
 
 $ saucestorage list
-   2069068  Sep 19 2015 01:15:21  Sample.ipa 
+      Size  Modification time     Name
+      ----  -----------------     ----
+   2069068  Sep 19 2015 01:15:21  Sample.ipa
   13317873  Sep 19 2015 01:20:55  MyApp.apk
 ```
 
@@ -137,15 +142,8 @@ The `--name` argument allows you to store a file under a different
 name than what it has on your filesystem. For instance:
 
 ``` bash
-$ saucestorage put 'My App.ipa' 
-File '/current/directory/My App.ipa' is now available as sauce-storage:My+App.ipa
-
 $ saucestorage put -n RemoteName.apk /path/to/LocalName.apk
-File '/current/directory/My App.ipa' is now available as sauce-storage:RemoteName.apk
-
-$ saucestorage list
-   2435341  Sep 19 2015 01:19:55  My App.ipa
-   4417873  Sep 19 2015 01:20:55  RemoteName.apk
+File '/current/directory/LocalName.apk' is now available as sauce-storage:RemoteName.apk
 ```
 
 ### update
