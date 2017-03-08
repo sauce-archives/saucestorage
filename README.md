@@ -38,7 +38,17 @@ there, in Sauce Labs' network.
 
 In the example in the Synopsis, the user wants to test the Android app `MyApp.apk`. She
 uploads it as shown, and then, in the `capabilities` for her tests,
-she refers to the app as `sauce-storage:MyApp.apk`.
+she refers to the app as `sauce-storage:MyApp.apk`:
+
+``` python
+  capabilities = {
+      "app": "sauce-storage:MyApp.apk",
+      "deviceName": "Samsung Galaxy S7 Device",
+      "platformName": "Android",
+      "platformVersion": "6"
+      # ...and so on
+  }
+```
 
 You can already use Sauce Storage with a simple `curl` command, but this utility should make it 
 a bit easier.
@@ -198,13 +208,16 @@ Files match.
 You can use it like this:
 
 ``` python
-storage_api = SauceStorageClient(username='your_user_name',
-                                 access_key='your_access_key')
-file_list = storage_api.list()
-for f in file_list:
+from saucestorage import SauceStorage
+
+storage = SauceStorage(username='your_user_name',
+                       access_key='your_access_key')
+for f in storage.list():
     print f['name']
 
-storage_api.put('/Users/me/SomeApp.ipa')
+storage_url = storage.put('/Users/me/Some App.ipa')
+
+print storage_url   # sauce-storage:Some%20App.ipa
 ```
 
 ## Limitations of the Sauce Storage API
