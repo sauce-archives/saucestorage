@@ -153,7 +153,7 @@ name than what it has on your filesystem. For instance:
 
 ``` bash
 $ saucestorage put -n RemoteName.apk /path/to/LocalName.apk
-File '/current/directory/LocalName.apk' is now available as sauce-storage:RemoteName.apk
+File '/path/to/LocalName.apk' is now available as sauce-storage:RemoteName.apk
 ```
 
 ### update
