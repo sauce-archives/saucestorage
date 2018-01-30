@@ -20,6 +20,7 @@
 
 # command line interface to saucestorage
 
+from __future__ import print_function
 import argparse
 import json
 import logging
@@ -36,7 +37,7 @@ def absolute_path_argument(path):
     return abspath(expanduser(path))
 
 def json_dump(d):
-    print json.dumps(d, sort_keys=True, indent=4, separators=(',', ': '))
+    print(json.dumps(d, sort_keys=True, indent=4, separators=(',', ': ')))
 
 def log_to_stderr(level=logging.INFO):
     root = logging.getLogger()
@@ -157,8 +158,8 @@ class Put(SauceStorageCommand):
         if self.args.as_json:
             json_dump(result)
         else:
-            print "File '{0}' is now available as {1}".format(self.args.file,
-                                                              result['url'])
+            print("File '{0}' is now available as {1}".format(self.args.file,
+                                                              result['url']))
 
 class List(SauceStorageCommand):
     TIME_FMT = "%b %d %Y %H:%M:%S"
@@ -178,13 +179,13 @@ class List(SauceStorageCommand):
         if self.args.as_json:
             json_dump(files)
         else:
-            print self.LIST_FMT.format('Size', 'Modification time', 'Name')
-            print self.LIST_FMT.format('----', '-----------------', '----')
+            print(self.LIST_FMT.format('Size', 'Modification time', 'Name'))
+            print(self.LIST_FMT.format('----', '-----------------', '----'))
             for f in files:
                 mtime = time.strftime(self.TIME_FMT, time.gmtime(f['mtime']))
-                print self.LIST_FMT.format(f['size'],
+                print(self.LIST_FMT.format(f['size'],
                                            mtime,
-                                           f['name'])
+                                           f['name']))
 
 class Update(SauceStorageCommand):
     def __init__(self, commander):
@@ -215,8 +216,8 @@ class Update(SauceStorageCommand):
         if self.args.as_json:
             json_dump(result)
         else:
-            print "File '{0}' is now available as {1}".format(self.args.file,
-                                                              result['url'])
+            print("File '{0}' is now available as {1}".format(self.args.file,
+                                                              result['url']))
 
 
 class Verify(SauceStorageCommand):
@@ -247,9 +248,9 @@ class Verify(SauceStorageCommand):
             json_dump({'verified': is_verified})
         else:
             if is_verified:
-                print "Files match."
+                print("Files match.")
             else:
-                print "Files do not match."
+                print("Files do not match.")
 
 if __name__ == '__main__':
     SauceStorageTool()
