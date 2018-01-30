@@ -21,6 +21,7 @@
 # command line interface to saucestorage
 
 from __future__ import print_function
+from builtins import object
 import argparse
 import json
 import logging

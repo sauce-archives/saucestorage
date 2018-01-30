@@ -23,13 +23,16 @@
 # http://saucelabs.com/docs/rest
 
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import base64
 import hashlib
 import json
 import logging
 import os.path
 import sys
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 __version__ = '0.3.1'
 
@@ -37,7 +40,7 @@ is_py2 = sys.version_info.major is 2
 log = logging.getLogger(__name__)
 
 if is_py2:
-    import httplib as http_client
+    import http.client as http_client
 else:
     import http.client as http_client
 
@@ -65,7 +68,7 @@ class SauceStorageApi(object):
         if path is not None:
             url = url + '/' + path
         if query is not None:
-            url = url + '?' + urllib.urlencode(query)
+            url = url + '?' + urllib.parse.urlencode(query)
         return url
 
     def get_headers(self, content_type):
@@ -158,7 +161,7 @@ class SauceStorage(object):
         return None
 
     def get_storage_url(self, remote_name):
-        return 'sauce-storage:' + urllib.quote_plus(remote_name)
+        return 'sauce-storage:' + urllib.parse.quote_plus(remote_name)
 
     def put(self, file_path, remote_name=None, overwrite=True):
         """ Upload a file to storage """
