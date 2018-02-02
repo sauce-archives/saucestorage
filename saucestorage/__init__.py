@@ -117,7 +117,7 @@ class SauceStorageApi(object):
         if overwrite:
             query = {'overwrite': 'true'}
         url = self.get_method_url('storage', path=remote_name, query=query)
-        with open(file_path, 'r') as body:
+        with open(file_path, 'rb') as body:
             json_data = self.request('POST',
                                      url,
                                      body=body,
